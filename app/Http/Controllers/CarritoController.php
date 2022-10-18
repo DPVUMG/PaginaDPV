@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Cart;
 use App\Http\Requests\AgregarMasRequest;
-use App\Product;
+use App\Models\ProductoVariante;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
@@ -25,15 +25,15 @@ class CarritoController extends Controller
         $carrito = null;
         $total = null;
 
-        if(!Session::has('cart'))
-            return view('shop.carrito', compact('carrito','total'));
+        if (!Session::has('cart'))
+            return view('shop.carrito', compact('carrito', 'total'));
 
         $oldCart = Session::get('cart');
         $carro = new Cart($oldCart);
         $carrito = $carro->productos;
-        $total = "Q ".number_format($carro->total, 2, '.', ',');
+        $total = "Q " . number_format($carro->total, 2, '.', ',');
 
-        return view('shop.carrito', compact('carrito','total'));
+        return view('shop.carrito', compact('carrito', 'total'));
     }
 
     /*
@@ -42,31 +42,28 @@ class CarritoController extends Controller
         Route name: carrito.agregar_inmediatamente
         Route URL: /agregar/inmediatamente/{producto}
         Paramétros: $request, $producto
-        Modelos: Product, Cart
+        Modelos: ProductoVariante, Cart
         Retorna: $notificacion
     */
-    public function agregar_inmediatamente(Request $request, Product $producto)
+    public function agregar_inmediatamente(Request $request, ProductoVariante $producto)
     {
         try {
 
             $oldCart = Session::has('cart') ? Session::get('cart') : null;
             $carro = new Cart($oldCart);
-            $carro->agregar_un_producto($producto, $producto->id);
+            $carro->agregar_un_producto($this->productoQuery(Auth::user()->escuela_id, 'ConsultaController.detalle', $producto->id));
 
             $request->session()->put('cart', $carro);
 
             $notificacion = array(
-                'message' => "El producto {$producto->title}, fue agragado al carrito con cantidad 1.",
+                'message' => "El producto {$producto->producto_select->nombre} - {$producto->variante->nombre}/{$producto->presentacion->nombre}, fue agragado al carrito con cantidad 1.",
                 'alert-type' => 'success'
             );
 
             return redirect()->back()->with($notificacion);
-
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $notificacion = array(
-                'message' => "El producto {$producto->title}, no fue agregado.",
+                'message' => "El producto {$producto->producto_select->nombre} - {$producto->variante->nombre}/{$producto->presentacion->nombre}, no fue agregado.",
                 'alert-type' => 'info'
             );
 
@@ -80,31 +77,28 @@ class CarritoController extends Controller
         Route name: carrito.agregar_mas
         Route URL: /agregar/mas
         Paramétros: $request
-        Modelos: Product, Cart
+        Modelos: ProductoVariante, Cart
         Retorna: $notificacion
     */
     public function agregar_mas(AgregarMasRequest $request)
     {
         try {
-
-            $producto = Product::find($request->product_id);
+            $producto = ProductoVariante::find($request->product_id);
             $oldCart = Session::has('cart') ? Session::get('cart') : null;
             $carro = new Cart($oldCart);
-            $carro->agregar_varios_productos($producto, $request->quantity, $producto->id);
+            $carro->agregar_varios_productos($request->product_id, $request->quantity, $this->productoQuery(Auth::user()->escuela_id, 'ConsultaController.detalle', $request->product_id));
 
             $request->session()->put('cart', $carro);
 
             $notificacion = array(
-                'message' => "La cantidad de {$request->quantity} fueron agregadas al producto {$producto->title}.",
+                'message' => "La cantidad de {$request->quantity} fueron agregadas al producto {$producto->producto_select->nombre} - {$producto->variante->nombre}/{$producto->presentacion->nombre}.",
                 'alert-type' => 'success'
             );
 
             return redirect()->back()->with($notificacion);
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $notificacion = array(
-                'message' => "La cantidad de {$request->quantity} no fueron agregadas al producto {$producto->title}.",
+                'message' => "La cantidad de {$request->quantity} no fueron agregadas al producto {$producto->producto_select->nombre} - {$producto->variante->nombre}/{$producto->presentacion->nombre}.",
                 'alert-type' => 'info'
             );
 
@@ -118,10 +112,10 @@ class CarritoController extends Controller
         Route name: carrito.eliminar
         Route URL: /eliminar/{producto}
         Paramétros: $producto
-        Modelos: Product, Cart
+        Modelos: ProductoVariante, Cart
         Retorna: $notificacion
     */
-    public function eliminar(Product $producto)
+    public function eliminar(ProductoVariante $producto)
     {
         try {
             $oldCart = Session::has('cart') ? Session::get('cart') : null;
@@ -133,16 +127,14 @@ class CarritoController extends Controller
             Session::put('cart', $carro);
 
             $notificacion = array(
-                'message' => "El producto {$producto->title} fue eliminado del carrito.",
+                'message' => "El producto {$producto->producto_select->nombre} - {$producto->variante->nombre}/{$producto->presentacion->nombre} fue eliminado del carrito.",
                 'alert-type' => 'error'
             );
 
             return redirect()->back()->with($notificacion);
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $notificacion = array(
-                'message' => "El producto {$producto->title} no fue eliminado del carrito.",
+                'message' => "El producto {$producto->producto_select->nombre} - {$producto->variante->nombre}/{$producto->presentacion->nombre} no fue eliminado del carrito.",
                 'alert-type' => 'info'
             );
 
@@ -156,10 +148,10 @@ class CarritoController extends Controller
         Route name: carrito.eliminar_cantidad
         Route URL: /eliminar/cantidad/{producto}
         Paramétros: $producto
-        Modelos: Product, Cart
+        Modelos: ProductoVariante, Cart
         Retorna: $notificacion
     */
-    public function eliminar_cantidad(Product $producto)
+    public function eliminar_cantidad(ProductoVariante $producto)
     {
         try {
             $oldCart = Session::has('cart') ? Session::get('cart') : null;
@@ -169,14 +161,12 @@ class CarritoController extends Controller
             Session::put('cart', $carro);
 
             $notificacion = array(
-                'message' => "Al producto {$producto->title} se le resto una unidad en el carrito.",
+                'message' => "Al producto {$producto->producto_select->nombre} - {$producto->variante->nombre}/{$producto->presentacion->nombre} se le resto una unidad en el carrito.",
                 'alert-type' => 'warning'
             );
 
             return redirect()->back()->with($notificacion);
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $notificacion = array(
                 'message' => $e->getMessage(),
                 'alert-type' => 'info'

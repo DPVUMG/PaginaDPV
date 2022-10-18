@@ -35,7 +35,6 @@ Route::group(['middleware' => ['guest']], function () {
     Route::name('user.')->group(function () {
         Route::get('login', 'UsuarioController@login')->name('login');
         Route::post('postlogin', 'UsuarioController@postlogin')->name('postlogin');
-        Route::post('create', 'UsuarioController@create')->name('create');
     });
 });
 /* ::::::::::::::::: ESTAS RUTAS NECESITA QUE EL USUARIO ESTE LOGUEADO :::::::::::: */
@@ -43,6 +42,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::name('user.')->group(function () {
         Route::get('perfil', 'UsuarioController@perfil')->name('perfil');
         Route::get('perfil/pedido/{numero}/detalle', 'UsuarioController@detalle_pedido')->name('detalle_pedido');
+        Route::delete('perfil/pedido/{numero}/cancelar', 'UsuarioController@cancelar')->name('cancelar');
         Route::get('logout', 'UsuarioController@logout')->name('logout');
         Route::get('perfil/pedido/{numero}/pdf', 'UsuarioController@pdf')->name('pdf');
     });
@@ -65,7 +65,7 @@ Route::group(['middleware' => ['auth']], function () {
 });
 /* ::::::::::::::::: ESTAS RUTAS NECESITA QUE EL USUARIO ESTE LOGUEADO :::::::::::: */
 Route::group(['middleware' => ['auth']], function () {
-/* ::::::::::::::::: ESTAS RUTAS NECESITA QUE EL USUARIO ESTE LOGUEADO :::::::::::: */
+    /* ::::::::::::::::: ESTAS RUTAS NECESITA QUE EL USUARIO ESTE LOGUEADO :::::::::::: */
     Route::name('comentario_producto.')->group(function () {
         Route::post('comentario/producto/nuevo', 'ComentariosController@comentario_producto_nuevo')->name('nuevo');
         Route::get('comentario/producto/eliminar/{id}', 'ComentariosController@comentario_producto_eliminar')->name('eliminar');
@@ -92,17 +92,5 @@ Route::group(['middleware' => ['auth']], function () {
     Route::name('pedido.')->group(function () {
         Route::get('pedido', 'PedidoController@index')->name('index');
         Route::post('realizar/pedido', 'PedidoController@realizar')->name('realizar');
-    });
-});
-
-
-//Declaramos rutas para registrar pedido
-/* ::::::::::::::::: ESTAS RUTAS NECESITA QUE EL USUARIO ESTE LOGUEADO :::::::::::: */
-Route::group(['middleware' => ['auth']], function () {
-    Route::name('credito.')->group(function () {
-        Route::get('credito', 'CreditController@index')->name('index');
-        Route::get('credito/create', 'CreditController@create')->name('create');
-        Route::post('credito/store', 'CreditController@store')->name('store');
-        Route::get('credito/pagar/{credito}', 'CreditController@pagar')->name('pagar');
     });
 });

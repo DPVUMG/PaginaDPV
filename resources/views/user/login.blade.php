@@ -22,39 +22,22 @@
                 <div class="login-form">{{--login--}}
                     <h2>Inicia Sesión</h2>
                     {!! Form::open(['route' => 'user.postlogin', 'method' => 'POST']) !!}
-                        <input type="email" value="comprar@pagina.com" placeholder="Email" name="email" />
-                        <input type="password" value="123456" placeholder="Password" name="password" />
-                        <span><input type="checkbox" class="form-checkbox" name="remember_me" value="true">Mantenerme conectado</span>
-                        <button type="submit" class="btn btn-default" name="buttonlogin" value="login">Login</button>
+                    <input type="text" value="" placeholder="usuario" name="usuario" />
+                    <input type="password" value="123456" placeholder="Password" name="password" />
+                    <span><input type="checkbox" class="form-checkbox" name="remember_me" value="true">Mantenerme
+                        conectado</span>
+                    <button type="submit" class="btn btn-default" name="buttonlogin" value="login">Login</button>
                     {!! Form::close() !!}
                 </div>{{--./login--}}
-            </div>
-            <div class="col-sm-1">
-                <h2 class="or">O</h2>
-            </div>
-            <div class="col-sm-4">
-                <div class="signup-form">{{--Registrar--}}
-                    <h2>¡Registrate en nuestra página web!</h2>
-                    {!! Form::open(['route' => 'user.create', 'method' => 'POST', 'enctype' => 'multipart/form-data']) !!}
-                        <input type="text" class="textbox" placeholder="Nombre Completo" name="name"/>
-                        <input type="email" class="textbox" placeholder="Email" name="email"/>
-                        {{ Form::password('password', ['placeholder' => 'Password', 'class' => 'textbox']) }}
-                        <div style="height: 230px; border: solid;" id="imagePreview"></div>
-                        <div class="form-group">
-                            <label style="font-size:24px;" for="input-avatar">{{ __('Click para subir imagen') }}</label>
-                            <input  class="textbox" type="file" onchange="return fileValidation()" name="avatar" id="input-avatar">
-                        </div>
-                        <input type="text" class="textbox" placeholder="Usuario" name="nickname"/>
-                        <button type="submit" class="btn btn-default" name="buttonlogin" value="registrar">Registrar</button>
-                    {!! Form::close() !!}
-                </div>{{--./Registrar--}}
             </div>
             <div class="col-sm-12">
                 <br><br>
                 <h2><strong>Concepto de e-commerce: qué es</strong></h2>
                 <p>El e-commerce o comercio electrónico,
-                <p><strong>Un</strong>&nbsp;<strong>sistema de compra y venta de productos y servicios que utiliza Internet como medio principal de intercambio</strong>.</p>
-                <p>En otras palabras, se trata de un comercio que gestiona los cobros y pagos a través de medios electrónicos.</p>
+                <p><strong>Un</strong>&nbsp;<strong>sistema de compra y venta de productos y servicios que utiliza
+                        Internet como medio principal de intercambio</strong>.</p>
+                <p>En otras palabras, se trata de un comercio que gestiona los cobros y pagos a través de medios
+                    electrónicos.</p>
                 <br><br><br><br><br><br><br>
             </div>
         </div>
@@ -63,7 +46,7 @@
 
 
 
-  <script>
+<script>
     function fileValidation(){
         var fileInput = document.getElementById('input-avatar');
         var filePath = fileInput.value;
@@ -88,5 +71,5 @@
             }
         }
     }
-  </script>
+</script>
 @endsection

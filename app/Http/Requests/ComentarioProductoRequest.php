@@ -25,7 +25,8 @@ class ComentarioProductoRequest extends FormRequest
     {
         return [
             'comment' => 'required|max:200',
-            'product_id' => 'required|integer|exists:products,id'
+            'product_id' => 'required|integer|exists:producto,id',
+            'producto_variante_id' => 'required|integer|exists:producto_variante,id'
         ];
     }
 
@@ -39,9 +40,14 @@ class ComentarioProductoRequest extends FormRequest
         return [
             'comment.required' => 'El comentario es obligatorio.',
             'comment.max'  => 'El comentario no debe tener más de :max caracteres.',
+
             'product_id.required' => 'El producto es obligatorio.',
             'product_id.integer'  => 'El producto debe de ser un número entero.',
             'product_id.exists'  => 'El producto seleccionado no existe.',
+
+            'producto_variante_id.required' => 'El producto es obligatorio.',
+            'producto_variante_id.integer'  => 'El producto debe de ser un número entero.',
+            'producto_variante_id.exists'  => 'El producto seleccionado no existe.',
         ];
     }
 }

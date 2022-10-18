@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Company;
-use App\Product;
-use App\Category;
-use App\SubCategory;
+use App\Models\Producto;
+use App\Models\Categoria;
+use App\Models\SubCategoria;
 use Illuminate\Http\Request;
+use App\Models\Configuracion;
+use App\Models\ProductoVariante;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 
 class ConsultaController extends Controller
@@ -28,21 +30,23 @@ class ConsultaController extends Controller
         Route name: consulta.index
         Route URL: /
         Paramétros:
-        Modelos: Product, Category
+        Modelos: Producto, ProductoVariante, Categoria
         Retorna: $ofertas, $productos, $categorias
     */
     public function index()
     {
-        $ofertas = Product::where('offer', true)->get();
-        $productos = Product::with(['images:id,photo,product_id'])->where('current', true)->orderBy('id', 'DESC')->take(6)->get();
-        $categorias = Category::with(['sub_categories:id,name,category_id'])->get();
-        $categorias_random = Category::with(['sub_categories:id,name,category_id'])
+        $ofertas = Producto::where('nuevo', true)->get();
+        $productos = $this->productoQuery(is_null(Auth::user()) ? 0 : Auth::user()->escuela_id, 'ConsultaController.index');
+        $categorias = Categoria::with(['sub_categorias:id,nombre,categoria_id'])->get();
+        $categorias_random = Categoria::with(['sub_categorias:id,nombre,categoria_id'])
             ->whereExists(
                 function ($query) {
                     $query->select(DB::raw(1))
-                        ->from('sub_categories')
-                        ->join('products', 'sub_categories.id', 'products.sub_category_id')
-                        ->whereRaw('categories.id = sub_categories.category_id');
+                        ->from('sub_categoria')
+                        ->join('producto_subcategoria', 'sub_categoria.id', 'producto_subcategoria.sub_categoria_id')
+                        ->join('producto', 'producto_subcategoria.producto_id', 'producto.id')
+                        ->where('producto.activo', true)
+                        ->whereRaw('categoria.id = sub_categoria.categoria_id');
                 }
             )
             ->inRandomOrder()
@@ -58,13 +62,13 @@ class ConsultaController extends Controller
         Route name: consulta.productos
         Route URL: /productos
         Paramétros:
-        Modelos: Product, Category
+        Modelos: ProductoVariante, Category
         Retorna: $productos, $categorias
     */
     public function productos()
     {
-        $productos = Product::where('current', true)->orderBy('id', 'DESC')->paginate(12);
-        $categorias = Category::with(['sub_categories:id,name,category_id'])->get();
+        $productos = $this->productoQuery(is_null(Auth::user()) ? 0 : Auth::user()->escuela_id, 'ConsultaController.productos');
+        $categorias = Categoria::with(['sub_categorias:id,nombre,categoria_id'])->get();
 
         return view('shop.productos', compact('productos', 'categorias'));
     }
@@ -75,12 +79,13 @@ class ConsultaController extends Controller
         Route name: consulta.detalle
         Route URL: /producto/{producto}/detalle
         Paramétros: $product->id
-        Modelos: Product, Category
+        Modelos: ProductoVariante, Categoria
         Retorna: $producto, $categorias
     */
-    public function detalle(Product $producto)
+    public function detalle(ProductoVariante $producto)
     {
-        $categorias = Category::with(['sub_categories:id,name,category_id'])->get();
+        $categorias = Categoria::with(['sub_categorias:id,nombre,categoria_id'])->get();
+        $producto = $this->productoQuery(is_null(Auth::user()) ? 0 : Auth::user()->escuela_id, 'ConsultaController.detalle', $producto->id);
 
         return view('shop.detalle', compact('producto', 'categorias'));
     }
@@ -91,14 +96,14 @@ class ConsultaController extends Controller
         Route name: consulta.sub_categoria
         Route URL: /sub_categoria/{sub_categoria}/productos
         Paramétros: $sub_categoria->id
-        Modelos: SubCategory, Category
+        Modelos: SubCategoria, Categoria
         Retorna: $categorias, $nombre_sub_categoria, $productos
     */
-    public function sub_categoria(SubCategory $sub_categoria)
+    public function sub_categoria(SubCategoria $sub_categoria)
     {
-        $categorias = Category::with(['sub_categories:id,name,category_id'])->get();
+        $categorias = Categoria::with(['sub_categorias:id,nombre,categoria_id'])->get();
         $nombre_sub_categoria = $sub_categoria->getCategoryAttribute();
-        $productos = Product::where('sub_category_id', $sub_categoria->id)->where('current', true)->orderBy('id', 'DESC')->paginate(12);
+        $productos = $this->productoQuery(is_null(Auth::user()) ? 0 : Auth::user()->escuela_id, 'ConsultaController.sub_categoria', $sub_categoria->id);
 
         return view('shop.sub_categoria', compact('categorias', 'nombre_sub_categoria', 'productos'));
     }
@@ -114,7 +119,7 @@ class ConsultaController extends Controller
     */
     public function buscar(Request $request)
     {
-        $productos = Product::search($request->search)->where('current', true)->paginate(10);
+        $productos = $this->productoQuery(is_null(Auth::user()) ? 0 : Auth::user()->escuela_id, 'ConsultaController.buscar', 0, $request->search);
 
         return view('shop.buscar', compact('productos'));
     }
@@ -125,12 +130,12 @@ class ConsultaController extends Controller
         Route name: consulta.empresa
         Route URL: /empresa
         Paramétros:
-        Modelos: Company
+        Modelos: Configuracion
         Retorna: $empresa
     */
     public function empresa()
     {
-        $empresa = Company::where('current', true)->first();
+        $empresa = Configuracion::where('pagina', true)->first();
 
         if (is_null($empresa)) {
             $notificacion = array(
@@ -151,12 +156,23 @@ class ConsultaController extends Controller
         Route name: consulta.contacto
         Route URL: /contacto
         Paramétros:
-        Modelos: Company
+        Modelos: Configuracion
         Retorna: $contacto
     */
     public function contacto()
     {
-        $contacto = Company::where('current', true)->first();
+        $contacto = Configuracion::where('pagina', true)->first();
+
+        if (is_null($contacto)) {
+            $notificacion = array(
+                'message' => 'No hay información de la empresa.',
+                'alert-type' => 'info'
+            );
+
+            return Redirect::route('consulta.index')
+                ->with($notificacion);
+        }
+
         return view('shop.contacto', compact('contacto'));
     }
 }

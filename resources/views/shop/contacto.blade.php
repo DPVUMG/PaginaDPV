@@ -8,28 +8,29 @@
         <div class="row">
             <div class="col-sm-12">
                 <div class="jumbotron text-center">
-                    <div id="map-canvas" style="height: 425px; width: 100%; position: relative; overflow: hidden;"></div>
+                    <div id="map-canvas" style="height: 425px; width: 100%; position: relative; overflow: hidden;">
+                    </div>
                 </div>
             </div>
             <div class="col-sm-3">
                 <blockquote class="blockquote">
-                    <p>Teléfonos ({{ $contacto->phones->count() }})</p>
+                    <p>Teléfonos ({{ $contacto->telefonos->count() }})</p>
 
-                    @foreach ($contacto->phones as $item)
-                        <footer class="blockquote-footer">
-                            <span><i class="fa fa-phone"></i> {{ $item->phone }}</span>
-                        </footer>
+                    @foreach ($contacto->telefonos as $item)
+                    <footer class="blockquote-footer">
+                        <span><i class="fa fa-phone"></i><a href="tel:+502{{ $item->telefono }}"></a></span>
+                    </footer>
                     @endforeach
                 </blockquote>
             </div>
             <div class="col-sm-5">
                 <blockquote class="blockquote">
-                    <p>Direcciones ({{ $contacto->addresses->count() }})</p>
+                    <p>Direcciones ({{ $contacto->direcciones->count() }})</p>
 
-                    @foreach ($contacto->addresses as $item)
-                        <footer class="blockquote-footer">
-                            <span><i class="fa fa-direction"></i> {{ $item->direction }}</span>
-                        </footer>
+                    @foreach ($contacto->direcciones as $item)
+                    <footer class="blockquote-footer">
+                        <span><i class="fa fa-direction"></i> {{ $item->direccion }}</span>
+                    </footer>
                     @endforeach
                 </blockquote>
             </div>
@@ -37,16 +38,20 @@
                 <blockquote class="blockquote">
                     <p>Siguenos en redes sociales</p>
                     <footer class="blockquote-footer">
-                        <span><i class="fa fa-facebook"></i> {{ $contacto->facebook }}</span>
+                        <span><i class="fa fa-facebook"></i><a href="{{ $contacto->facebook }}" target="_blank"
+                                rel="noopener noreferrer"></a></span>
                     </footer>
                     <footer class="blockquote-footer">
-                        <span><i class="fa fa-twitter"></i> {{ $contacto->twitter }}</span>
+                        <span><i class="fa fa-twitter"></i><a href="{{ $contacto->twitter }}" target="_blank"
+                                rel="noopener noreferrer"></a> </span>
                     </footer>
                     <footer class="blockquote-footer">
-                        <span><i class="fa fa-instagram"></i> {{ $contacto->instagram }}</span>
+                        <span><i class="fa fa-instagram"></i><a href="{{ $contacto->instagram }}" target="_blank"
+                                rel="noopener noreferrer"></a></span>
                     </footer>
                     <footer class="blockquote-footer">
-                        <span><i class="fa fa-laptop"></i> {{ $contacto->page }}</span>
+                        <span><i class="fa fa-laptop"></i><a href="{{ $contacto->url }}" target="_blank"
+                                rel="noopener noreferrer"></a></span>
                     </footer>
                 </blockquote>
             </div>
@@ -59,14 +64,15 @@
 
 @endsection
 @section('scripts')
-<script type='text/javascript' src='https://maps.google.com/maps/api/js?language=es&key={{ env('GOOGLE_MAPS_API_KEY') }}'></script>
+<script type='text/javascript' src='https://maps.google.com/maps/api/js?language=es&key={{ env(' GOOGLE_MAPS_API_KEY')
+    }}'></script>
 <script defer>
-    const empresa = {!! json_encode($contacto->name) !!};
-    const longitud = {!! json_encode($contacto->ubication_x) !!};
-    const latitud = {!! json_encode($contacto->ubication_y) !!};
-    const logotipo = {!! json_encode($contacto->logotipo) !!};
-    const direccion = {!! json_encode($contacto->addresses->take(1)) !!};
-    const telefono = {!! json_encode($contacto->phones->take(1)) !!};
+    const empresa = {!! json_encode($contacto->nombre) !!};
+    const longitud = {!! json_encode($contacto->ubicacion_x) !!};
+    const latitud = {!! json_encode($contacto->ubicacion_y) !!};
+    const logotipo = {!! json_encode($contacto->getLogotipoPictureAttribute()) !!};
+    const direccion = {!! json_encode($contacto->direcciones->take(1)) !!};
+    const telefono = {!! json_encode($contacto->telefonos->take(1)) !!};
 
 	function initialize() {
 		var mapOptions = {
@@ -134,8 +140,8 @@
                     <div class="geodir-output-location">
                     <div class="geodir-output-location geodir-output-location-mapbubble">
                         <div class="geodir_post_meta  geodir-field-post_title"><span class="geodir_post_meta_icon geodir-i-text">
-                            <span class="geodir_post_meta_title">Dirección: </span></span>`+direccion[0].direction+`</span><br>
-                            <span class="geodir_post_meta_title">Teléfono: </span></span>`+telefono[0].phone+`</span>
+                            <span class="geodir_post_meta_title">Dirección: </span></span>`+direccion[0].direccion+`</span><br>
+                            <span class="geodir_post_meta_title">Teléfono: </span></span>`+telefono[0].telefono+`</span>
                         </div>
                     </div>
                     </div>

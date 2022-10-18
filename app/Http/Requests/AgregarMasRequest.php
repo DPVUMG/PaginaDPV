@@ -25,7 +25,7 @@ class AgregarMasRequest extends FormRequest
     {
         return [
             'quantity' => 'required|integer|between:1,100',
-            'product_id' => 'required|integer|exists:products,id'
+            'product_id' => 'required|integer|exists:producto_variante,id'
         ];
     }
 

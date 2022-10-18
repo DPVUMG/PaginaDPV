@@ -3,14 +3,13 @@
 <script src="{{asset('js/custom.min.js')}}"></script>
 <script src="{{asset('js/jquery.mlens-1.7.min.js')}}"></script>
 <script src="{{asset('js/funcionalidad.js')}}"></script>
-
-<!--
-<script src="{{asset('js/all.min.js')}}"></script>
-<script src="{{asset('js/brands.min.js')}}"></script>
-<script src="{{asset('js/fontawesome.min.js')}}"></script>
-<script src="{{asset('js/solid.min.js')}}"></script>
--->
-<script src="https://cdn.jsdelivr.net/npm/lazyload@2.0.0-rc.2/lazyload.js"></script>
+<script src="{{asset('js/lazyload.js')}}"></script>
+<script src="{{asset('js/jquery-ui/jquery-ui.min.js')}}"></script>
+<script src="{{asset('js/bootstrap-selectpicker.js')}}"></script>
+<script src="{{asset('js/jquery.dataTables.min.js')}}"></script>
+<script src="{{asset('js/jquery.validate.min.js')}}"></script>
+<script src="{{asset('js/sweetalert2.js')}}"></script>
+<script src="https://cdn.ckeditor.com/4.20.0/full-all/ckeditor.js"></script>
 
 <script>
     lazyload();
@@ -99,6 +98,144 @@
             imgOverlay: $("#image_zoom").attr("data-overlay"), // path of the overlay image (optional)
             overlayAdapt: true // true if the overlay image has to adapt to the lens size (true/false)
         });
+
+        $('.selectpicker').selectpicker();
+
+        $('.dataTable').DataTable({
+            serverSide: false,
+            paging: true,
+            autoWidth: true,
+            processing: true,
+            ordering: true,
+            info: true,
+            searching: true,
+            responsive: true,
+            language: {
+                url: 'https://cdn.datatables.net/plug-ins/1.11.5/i18n/es-ES.json',
+            }
+        });
+
+        $('.dataTableNotPaginate').DataTable({
+            serverSide: false,
+            paging: false,
+            autoWidth: true,
+            processing: true,
+            ordering: true,
+            info: true,
+            searching: true,
+            responsive: true,
+            language: {
+                url: 'https://cdn.datatables.net/plug-ins/1.11.5/i18n/es-ES.json',
+            }
+        });
+
+        $('.solo-numero').keyup(function () {
+            this.value = (this.value + '').replace(/[^0-9]/g, '');
+        });
+
+        $(".btnEliminarItem").tooltip({
+            show: {
+                effect: "slideDown",
+                delay: 250
+            }
+        });
+    });
+
+    $("#acciongregarMas").on( "click", function(e) {
+        e.preventDefault();
+        Swal.fire({
+            title: '¡Carrito!',
+            text: '¿Está seguro de agregar el producto al carrito?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'SI',
+            cancelButtonText: 'NO'
+        }).then((result) => {
+            if (result.value) {
+                $(`#formAgregarMas`).first().submit();
+            }
+        })
+    });
+    
+
+    $(".btnEliminarItem").on("click", function(e) {
+        e.preventDefault();
+        Swal.fire({
+            title: 'Eliminar',
+            text: '¿Desea eliminar el producto de la lista?',
+            icon: 'error',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'SI',
+            cancelButtonText: 'NO'
+            }).then((result) => {
+            if (result.isConfirmed) {
+                let id = $(this).attr('id').split("-");
+                $(`#formEliminarItem${id[1]}`).first().submit();
+            }
+        })
+    });
+    
+
+    $(".btnDetalleItem").on("click", function(e) {
+        e.preventDefault();
+        Swal.fire({
+            title: 'Detalle',
+            text: '¿Desea ver más información del producto?',
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'SI',
+            cancelButtonText: 'NO'
+            }).then((result) => {
+            if (result.isConfirmed) {
+                let id = $(this).attr('id').split("-");
+                $(`#formDetalleItem${id[1]}`).first().submit();
+            }
+        })
+    });
+    
+
+    $("#btnConfirmarPedido").on("click", function(e) {
+        e.preventDefault();
+        Swal.fire({
+            title: 'Confirmar Pedido',
+            text: '¿Desea confirmar el pedido?',
+            icon: 'success',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'SI',
+            cancelButtonText: 'NO'
+            }).then((result) => {
+            if (result.isConfirmed) {
+                $(`#formConfirmarPedido`).first().submit();
+            }
+        })
+    });
+    
+
+    $(".btnCancelarItem").on("click", function(e) {
+        e.preventDefault();
+        Swal.fire({
+            title: 'Cancelar',
+            text: '¿Desea cancelar el pedido ingresado?',
+            icon: 'error',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'SI',
+            cancelButtonText: 'NO'
+            }).then((result) => {
+            if (result.isConfirmed) {
+                let id = $(this).attr('id').split("-");
+                $(`#formCancelarItem${id[1]}`).first().submit();
+            }
+        })
     });
 
     var cambiar_imagen = document.querySelectorAll("div.item > img.cambiar_imagen");

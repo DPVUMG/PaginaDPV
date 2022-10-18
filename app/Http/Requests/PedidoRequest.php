@@ -24,13 +24,7 @@ class PedidoRequest extends FormRequest
     public function rules()
     {
         return [
-            'nit' => 'required|integer|digits_between:6,9',
-            'name_complete' => 'required|max:100',
-            'email' => 'required|email|max:100',
-            'direction' => 'required|max:150',
-            'phone' => 'required|integer|digits:8',
-            'observation' => 'nullable|max:150',
-            'credit_id' => 'starts_with:on'
+            'fecha_entrega' => 'required|date_format:d-m-Y'
         ];
     }
 
@@ -42,27 +36,8 @@ class PedidoRequest extends FormRequest
     public function messages()
     {
         return [
-            'nit.required' => 'El NIT es obligatorio.',
-            'nit.digits_between' => 'El número de NIT debe contener entre :min y :max dígitos.',
-            'nit.integer' => 'El NIT debe de ser números enteros.',
-
-            'name_complete.required'  => 'El nombre es obligatorio.',
-            'name_complete.max'  => 'El nombre no debe tener más de :max caracteres.',
-
-            'email.required'  => 'El correo electrónico es obligatorio.',
-            'email.email'  => 'El correo electrónico no es válido.',
-            'email.max'  => 'El correo electrónico no debe tener más de :max caracteres.',
-
-            'direction.required'  => 'La dirección de domicilio es obligatorio.',
-            'direction.max'  => 'La dirección de domicilio no debe tener más de :max caracteres.',
-
-            'phone.required' => 'El número de teléfono es obligatorio.',
-            'phone.digits' => 'El número de teléfono debe contener :digits dígitos.',
-            'phone.integer' => 'El número de teléfono debe de ser números enteros.',
-
-            'observation.max'  => 'La observación no debe tener más de :max caracteres.',
-
-            'credit_id.starts_with'  => 'El check del crédito tiene formato incorrecto.'
+            'fecha_entrega.required' => 'La fecha de entrega es obligatoria.',
+            'fecha_entrega.date_format' => 'La fecha de entrega no tiene formato correcto.'
         ];
     }
 }

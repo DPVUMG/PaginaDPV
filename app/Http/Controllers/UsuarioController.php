@@ -2,18 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Company;
-use App\Credit;
-use App\Detail;
-use App\User;
+use App\Models\Escuela;
+use App\Models\EscuelaPedido;
+use App\Models\EscuelaUsuario;
+use Barryvdh\DomPDF\Facade as PDF;
+use Illuminate\Support\Facades\DB;
 use App\Http\Requests\LoginRequest;
+use App\Models\EscuelaDetallePedido;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Requests\UsuarioRequest;
-use App\Order;
-use App\RequestCredit;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Redirect;
-use Barryvdh\DomPDF\Facade as PDF;
 
 class UsuarioController extends Controller
 {
@@ -37,38 +35,45 @@ class UsuarioController extends Controller
         Route name: user.postlogin
         Route URL: /postlogin
         Paramétros: $request
-        Modelos:
+        Modelos: EscuelaUsuario
         Retorna: $notificacion
     */
     public function postlogin(LoginRequest $request)
     {
-        if (Auth::attempt(['email' => $request->email, 'password' => $request->password], $request->remember_me))
-        {
+        if (!$request->has('buttonlogin') && $request->buttonlogin = "login") {
+            //Si los datos del usuarios no son correctos
+            $notificacion = array(
+                'message' => 'Formulario de inicio de sesión incorrecto',
+                'alert-type' => 'error'
+            );
+
+            return Redirect::route('user.login')
+                ->with($notificacion);
+        }
+
+        if (Auth::attempt(['usuario' => $request->usuario, 'password' => $request->password], $request->remember_me)) {
             //Verificamos si el usuario se encuentra activo, si en caso no estuviera activo lo mandos al login.
-            if(is_null(User::where('email', $request->email)->where('current', true)->first()))
-            {
+            if (is_null(EscuelaUsuario::where('usuario', $request->usuario)->where('activo', true)->first())) {
                 Auth::logout();
+
                 $notificacion = array(
                     'message' => 'El usuario se encuentra inactivo, comunicarse con soporte técnico.',
                     'alert-type' => 'info'
                 );
 
                 return Redirect::route('user.login')
-                                ->with($notificacion);
+                    ->with($notificacion);
             }
 
             //Si el usuario inicia sesión guardamos datos para la compra del carrito
-            if(Session::has('oldUrl'))
-            {
+            if (Session::has('oldUrl')) {
                 $oldUrl = Session::get('oldUrl');
                 Session::forget('oldUrl');
                 return Redirect::to($oldUrl);
             }
 
             return Redirect::route('consulta.index');
-        }
-        else
-        {
+        } else {
             //Si los datos del usuarios no son correctos
             $notificacion = array(
                 'message' => 'Usuario o contraseña incorrectos',
@@ -76,46 +81,8 @@ class UsuarioController extends Controller
             );
 
             return Redirect::route('user.login')
-                            ->with($notificacion);
+                ->with($notificacion);
         }
-    }
-
-    /*
-        Descripción: función para crear usuario.
-        Page: resources/views/user/login
-        Route name: user.create
-        Route URL: /create
-        Paramétros: $request
-        Modelos: User
-        Retorna: $notificacion
-    */
-    public function create(UsuarioRequest $request)
-    {
-        $data = $request->all();
-
-        if(!empty($request->avatar))
-        {
-            $img_data = file_get_contents($request->file('avatar'));
-            $base64 = base64_encode($img_data);
-            $data['avatar'] = $base64;
-        }
-
-        $nuevousuario = User::create($data);
-        $nuevousuario->save();
-
-        $notificacion = array(
-                    'message' => 'Usuario registrado correctamente, inicie sesión',
-                    'alert-type' => 'success'
-                );
-
-        if(Session::has('oldUrl'))
-        {
-            $oldUrl = Session::get('oldUrl');
-            Session::forget('oldUrl');
-            return Redirect::to($oldUrl)->with($notificacion);
-        }
-
-        return Redirect::back()->with($notificacion);
     }
 
     /*
@@ -124,12 +91,12 @@ class UsuarioController extends Controller
         Route name: user.perfil
         Route URL: /perfil
         Paramétros:
-        Modelos: User
+        Modelos: EscuelaPedido
         Retorna: $pedidos
     */
     public function perfil()
     {
-        $pedidos = Order::where('user_id', Auth::user()->id)->orderBy('id','DESC')->paginate(10);
+        $pedidos = EscuelaPedido::where('escuela_id', Auth::user()->escuela_id)->orderBy('id', 'DESC')->get();
 
         return view('user.perfil', compact('pedidos'));
     }
@@ -140,14 +107,54 @@ class UsuarioController extends Controller
         Route name: user.detalle_pedido
         Route URL: /perfil/pedido/{numero}/detalle
         Paramétros: $numero
-        Modelos: Order, Detail
+        Modelos: EscuelaPedido, EscuelaDetallePedido
         Retorna: $pedido, $detalles
     */
-    public function detalle_pedido($numero)
+    public function detalle_pedido(EscuelaPedido $numero)
     {
-        $pedido = Order::find($numero);
-        $detalles = Detail::where('order_id', $pedido->id)->get();
-        return view('user.detalle_pedido', compact('pedido','detalles'));
+        $pedido = $numero;
+        $detalles = EscuelaDetallePedido::where('escuela_pedido_id', $pedido->id)->get();
+        $usuario = Auth::user();
+        $escuela = Escuela::find($usuario->escuela_id);
+
+        return view('user.detalle_pedido', compact('pedido', 'detalles', 'usuario', 'escuela'));
+    }
+
+    /*
+        Descripción: función para cancelar el pedido seleccionado.
+        Page: resources/views/user/perfil
+        Route name: user.cancelar
+        Route URL: /perfil/pedido/{numero}/cancelar
+        Paramétros: $numero
+        Modelos: EscuelaPedido
+        Retorna: $pedido, $detalles
+    */
+    public function cancelar(EscuelaPedido $numero)
+    {
+        try {
+            DB::beginTransaction();
+
+            $numero->estado_pedido_id = 6;
+            $numero->save();
+
+            EscuelaDetallePedido::where('escuela_pedido_id', $numero->id)->update(['activo' => false]);
+
+            $this->historialPedido(1, 6, $numero->id);
+
+            DB::commit();
+
+            $notificacion = array(
+                'message' => "El pedido número {$numero->id} fue cancelado.",
+                'alert-type' => 'success'
+            );
+        } catch (\Throwable $th) {
+            $notificacion = array(
+                'message' => "Ocurrio un problema al cancelar el pedido número {$numero->id}",
+                'alert-type' => 'error'
+            );
+        }
+
+        return redirect()->route('user.perfil')->with($notificacion);
     }
 
     /*
@@ -167,17 +174,7 @@ class UsuarioController extends Controller
 
     public function pdf($numero)
     {
-        $tipo_credito = null;
-        $pedido = Order::find($numero);
-        $detalles = Detail::where('order_id', $pedido->id)->get();
-        if($pedido->status == Order::CREDITO)
-        {
-            $credito = RequestCredit::where('order_id', $pedido->id)->first();
-            $tipo_credito = Credit::find($credito->credit_id);
-        }
-        $company = Company::find(1);
-
-        $pdf = PDF::loadView('pdf.factura', compact('pedido','detalles','company','credito','tipo_credito'));
+        $pdf = PDF::loadView('pdf.factura', compact('pedido', 'detalles', 'company', 'credito', 'tipo_credito'));
         return $pdf->stream('factura.pdf');
     }
 }

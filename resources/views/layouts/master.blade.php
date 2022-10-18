@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="utf-8">
     <meta http-equiv="Content-Language" content="es">
@@ -12,6 +13,7 @@
     @yield('styles')
     @yield('extra-css')
 </head>
+
 <body onload="init();">
     @include('partials.header')
     @yield('content')
@@ -19,4 +21,5 @@
     @include('partials.scripts')
     @yield('scripts')
 </body>
+
 </html>

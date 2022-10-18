@@ -51,7 +51,7 @@ return [
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),
-            'url' => env('APP_URL').'/storage',
+            'url' => env('ASSET_URL') . '/storage',
             'visibility' => 'public',
         ],
 
@@ -63,6 +63,41 @@ return [
             'bucket' => env('AWS_BUCKET'),
             'url' => env('AWS_URL'),
             'endpoint' => env('AWS_ENDPOINT'),
+        ],
+
+        'logotipo' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/logotipo'),
+            'url' => env('ASSET_URL') . '/storage/logotipo',
+            'visibility' => 'public',
+        ],
+
+        'categoria' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/categoria'),
+            'url' => env('ASSET_URL') . '/storage/categoria',
+            'visibility' => 'public',
+        ],
+
+        'avatar' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/avatar'),
+            'url' => env('ASSET_URL') . '/storage/avatar',
+            'visibility' => 'public',
+        ],
+
+        'producto' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/producto'),
+            'url' => env('ASSET_URL') . '/storage/producto',
+            'visibility' => 'public',
+        ],
+
+        'escuela' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/escuela'),
+            'url' => env('ASSET_URL') . '/storage/escuela',
+            'visibility' => 'public',
         ],
 
     ],

@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Comment;
+use App\Models\Comentario;
+use App\Models\ComentarioProducto;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\ComentarioGeneralRequest;
 use App\Http\Requests\ComentarioProductoRequest;
-use App\ProductComment;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class ComentariosController extends Controller
 {
@@ -17,12 +16,12 @@ class ComentariosController extends Controller
         Route name: comentario_general.index
         Route URL: /comentarios
         Paramétros:
-        Modelos: Comment
+        Modelos: Comentario
         Retorna: $comentarios
     */
     public function comentario_general_index()
     {
-        $comentarios = Comment::orderBy('id', 'DESC')->paginate(20);
+        $comentarios = Comentario::where('escuela_usuario_id', Auth::user() == null ? 0 : Auth::user()->id)->orderBy('id', 'DESC')->paginate(20);
         return view('shop.comentarios', compact('comentarios'));
     }
 
@@ -32,14 +31,14 @@ class ComentariosController extends Controller
         Route name: comentario_general.nuevo
         Route URL: /comentario/general/nuevo
         Paramétros: $request
-        Modelos: Comment
+        Modelos: Comentario
         Retorna: $notificacion
     */
     public function comentario_general_nuevo(ComentarioGeneralRequest $request)
     {
-        $comentario = new Comment();
+        $comentario = new Comentario();
         $comentario->comment = $request->comment;
-        $comentario->user_id = Auth::user()->id;
+        $comentario->escuela_usuario_id = Auth::user()->id;
         $comentario->save();
 
         $notificacion = array(
@@ -56,10 +55,10 @@ class ComentariosController extends Controller
         Route name: comentario_general.eliminar
         Route URL: /comentario/general/eliminar/{id}
         Paramétros: $id
-        Modelos: Comment
+        Modelos: Comentario
         Retorna: $notificacion
     */
-    public function comentario_general_eliminar(Comment $id)
+    public function comentario_general_eliminar(Comentario $id)
     {
         $id->delete();
 
@@ -77,15 +76,15 @@ class ComentariosController extends Controller
         Route name: comentario_producto.nuevo
         Route URL: /comentario/producto/nuevo
         Paramétros: $request
-        Modelos: ProductComment
+        Modelos: ComentarioProducto
         Retorna: $notificacion
     */
     public function comentario_producto_nuevo(ComentarioProductoRequest $request)
     {
-        $comentario = new ProductComment();
+        $comentario = new ComentarioProducto();
         $comentario->comment = $request->comment;
-        $comentario->product_id = $request->product_id;
-        $comentario->user_id = Auth::user()->id;
+        $comentario->producto_id = $request->product_id;
+        $comentario->escuela_usuario_id = Auth::user()->id;
         $comentario->save();
 
         $notificacion = array(
@@ -93,7 +92,7 @@ class ComentariosController extends Controller
             'alert-type' => 'success'
         );
 
-        return redirect()->route('consulta.detalle',['producto' => $comentario->product_id])->with($notificacion);
+        return redirect()->route('consulta.detalle', ['producto' => $request->producto_variante_id])->with($notificacion);
     }
 
     /*
@@ -102,10 +101,10 @@ class ComentariosController extends Controller
         Route name: comentario_producto.eliminar
         Route URL: /comentario/producto/eliminar/{id}
         Paramétros: $id
-        Modelos: ProductComment
+        Modelos: ComentarioProducto
         Retorna: $notificacion
     */
-    public function comentario_producto_eliminar(ProductComment $id)
+    public function comentario_producto_eliminar(ComentarioProducto $id)
     {
         $id->delete();
 
@@ -114,6 +113,6 @@ class ComentariosController extends Controller
             'alert-type' => 'success'
         );
 
-        return redirect()->route('consulta.detalle',['producto' => $id->product_id])->with($notificacion);
+        return redirect()->route('consulta.detalle', ['producto' => $id->product_id])->with($notificacion);
     }
 }
