@@ -50,11 +50,6 @@
                                         $producto->getStringNewProductAttribute($producto->producto_nuevo) }}</span>
                                     @endif
 
-                                    @if($producto->producto_temporada == 1)
-                                    <span class="label label-warning newarrival">TEMPORADA, el producto esta sujeto a
-                                        cambios.</span>
-                                    @endif
-
                                     <h2>{{$producto->producto_nombre}}</h2>
                                     <p>Código: {{$producto->producto_codigo}}</p>
                                     <span>
@@ -75,7 +70,10 @@
                                         ])!!}
                                         {!!Form::close()!!}
                                         @endif
-                                    </span>
+                                    </span>@if($producto->producto_temporada == 1)
+                                    <span class="label label-warning ">TEMPORADA, el producto esta sujeto a
+                                        cambios.</span>
+                                    @endif
 
                                     <p><b>Marca:</b> {{ $producto->marca_nombre }}</p>
                                     <p><b>Varriante:</b> {{ $producto->variante_nombre }}</p>

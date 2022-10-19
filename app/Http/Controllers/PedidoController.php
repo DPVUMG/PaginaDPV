@@ -40,7 +40,7 @@ class PedidoController extends Controller
         $carro = new Cart($oldCart);
 
         $carrito = $carro->productos;
-        $total = "Q " . number_format($carro->total, 2, '.', ',');
+        $total = $carro->total;
         $usuario = Auth::user();
         $escuela = Escuela::find($usuario->escuela_id);
 

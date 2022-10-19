@@ -1,6 +1,6 @@
 <div class="card">
     <div class="table-responsive ">
-        <table class="dataTable display cart_info" style="width:100%">
+        <table class="dataTable display nowrap cart_info" style="width:100%">
             <thead>
                 <tr class="cart_menu">
                     <th colspan="4" class="text-center align-middle">Producto</th>

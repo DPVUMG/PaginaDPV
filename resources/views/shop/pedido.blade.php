@@ -69,8 +69,10 @@
             <div class="col-sm-6">
                 <div class="total_area">
                     <ul>
-                        <li class="text-right">Total <h1 style="color: black;"><strong>{{ number_format($total,
-                                    2, '.', ',') }}</strong></h1>
+                        <li class="text-right">Total
+                            <h1 style="color: black;">
+                                <strong>Q {{ number_format($total, 2, '.', ',') }}</strong>
+                            </h1>
                         </li>
                         @if (!empty($carrito))
                         <li class="text-center">

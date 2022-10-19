@@ -10,6 +10,12 @@
 <script src="{{asset('js/jquery.validate.min.js')}}"></script>
 <script src="{{asset('js/sweetalert2.js')}}"></script>
 <script src="https://cdn.ckeditor.com/4.20.0/full-all/ckeditor.js"></script>
+<script src="{{asset('js/dataTables.buttons.min.js')}}"></script>
+<script src="{{asset('js/jszip.min.js')}}"></script>
+<script src="{{asset('js/pdfmake.min.js')}}"></script>
+<script src="{{asset('js/vfs_fonts.js')}}"></script>
+<script src="{{asset('js/buttons.html5.min.js')}}"></script>
+<script src="{{asset('js/buttons.print.min.js')}}"></script>
 
 <script>
     lazyload();
@@ -113,6 +119,42 @@
             language: {
                 url: 'https://cdn.datatables.net/plug-ins/1.11.5/i18n/es-ES.json',
             }
+        });
+
+        $('.dataTableExport').DataTable({
+            serverSide: false,
+            paging: true,
+            autoWidth: true,
+            processing: true,
+            ordering: true,
+            info: true,
+            searching: true,
+            responsive: true,
+            language: {
+                url: 'https://cdn.datatables.net/plug-ins/1.11.5/i18n/es-ES.json',
+            },
+            dom: 'Bfrtip',
+            buttons: [
+                'copy', 'csv', 'excel', 'pdf', 'print'
+            ]
+        });
+
+        $('.dataTableExportNotPaginate').DataTable({
+            serverSide: false,
+            paging: false,
+            autoWidth: true,
+            processing: true,
+            ordering: false,
+            info: true,
+            searching: true,
+            responsive: true,
+            language: {
+                url: 'https://cdn.datatables.net/plug-ins/1.11.5/i18n/es-ES.json',
+            },
+            dom: 'Bfrtip',
+            buttons: [
+                'copy', 'csv', 'excel', 'pdf', 'print'
+            ]
         });
 
         $('.dataTableNotPaginate').DataTable({
