@@ -83,7 +83,7 @@ class PedidoController extends Controller
                     'pagado' => false,
                     'fecha_pedido' => date('Y-m-d'),
                     'fecha_entrega' => date('Y-m-d', strtotime($request->fecha_entrega)),
-                    'sub_total' => $carro->total - $carro->descuento,
+                    'sub_total' => $carro->total + $carro->descuento,
                     'descuento' => $carro->descuento,
                     'total' => $carro->total,
                     'anio' => date('Y'),

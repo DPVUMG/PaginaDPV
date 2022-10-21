@@ -132,21 +132,28 @@ class UsuarioController extends Controller
     public function cancelar(EscuelaPedido $numero)
     {
         try {
-            DB::beginTransaction();
+            if ($numero->escuela_pedido_id == 1) {
+                DB::beginTransaction();
 
-            $numero->estado_pedido_id = 6;
-            $numero->save();
+                $numero->estado_pedido_id = 6;
+                $numero->save();
 
-            EscuelaDetallePedido::where('escuela_pedido_id', $numero->id)->update(['activo' => false]);
+                EscuelaDetallePedido::where('escuela_pedido_id', $numero->id)->update(['activo' => false]);
 
-            $this->historialPedido(1, 6, $numero->id);
+                $this->historialPedido(1, 6, $numero->id);
 
-            DB::commit();
+                DB::commit();
 
-            $notificacion = array(
-                'message' => "El pedido número {$numero->id} fue cancelado.",
-                'alert-type' => 'success'
-            );
+                $notificacion = array(
+                    'message' => "El pedido número {$numero->id} fue cancelado.",
+                    'alert-type' => 'success'
+                );
+            } else {
+                $notificacion = array(
+                    'message' => "El pedido número {$numero->id} no pudo ser cancelada porque ya fue {$numero->estado_pedido->nombre}.",
+                    'alert-type' => 'info'
+                );
+            }
         } catch (\Throwable $th) {
             $notificacion = array(
                 'message' => "Ocurrio un problema al cancelar el pedido número {$numero->id}",
