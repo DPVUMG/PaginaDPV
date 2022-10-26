@@ -132,7 +132,7 @@ class UsuarioController extends Controller
     public function cancelar(EscuelaPedido $numero)
     {
         try {
-            if ($numero->escuela_pedido_id == 1) {
+            if ($numero->estado_pedido_id == 1) {
                 DB::beginTransaction();
 
                 $numero->estado_pedido_id = 6;
