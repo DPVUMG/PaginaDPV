@@ -7,13 +7,13 @@
                 <div class="panel-heading">
                     <h4 class="panel-title">
                         <a data-toggle="collapse" data-parent="#accordian"
-                            href="#{{str_replace([' ',','],['',''],$categoria->nombre)}}">
+                            href="#{{str_replace([' ',',','.'],['','',''],$categoria->nombre)}}">
                             <span class="badge pull-right">{{ $categoria->sub_categorias->count() }}</span>
                             {{$categoria->nombre}}
                         </a>
                     </h4>
                 </div>
-                <div id="{{str_replace([' ',','],['',''],$categoria->nombre)}}" class="panel-collapse collapse">
+                <div id="{{str_replace([' ',',','.'],['','',''],$categoria->nombre)}}" class="panel-collapse collapse">
                     <div class="panel-body">
                         <ul>
                             @forelse($categoria->sub_categorias as $sub_categoria)
