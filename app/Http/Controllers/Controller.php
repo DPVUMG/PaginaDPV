@@ -39,7 +39,7 @@ class Controller extends BaseController
                 $informacion = ProductoVariante::consulta($escuela_id)
                     ->where('producto_variante.activo', true)
                     ->where('producto.activo', true)
-                    ->where('producto_variante.id', $id)
+                    ->where('producto.id', $id)
                     ->first();
                 break;
 
