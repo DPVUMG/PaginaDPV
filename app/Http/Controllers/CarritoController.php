@@ -51,7 +51,7 @@ class CarritoController extends Controller
 
             $oldCart = Session::has('cart') ? Session::get('cart') : null;
             $carro = new Cart($oldCart);
-            $carro->agregar_un_producto($this->productoQuery(Auth::user()->escuela_id, 'ConsultaController.detalle', $producto->id));
+            $carro->agregar_un_producto($this->productoQuery(Auth::user()->escuela_id, 'ConsultaController.detalle', $producto->producto_id));
 
             $request->session()->put('cart', $carro);
 
@@ -62,8 +62,6 @@ class CarritoController extends Controller
 
             return redirect()->back()->with($notificacion);
         } catch (\Exception $e) {
-
-            dd($e);
             $notificacion = array(
                 'message' => "El producto {$producto->producto_select->nombre} - {$producto->variante->nombre}/{$producto->presentacion->nombre}, no fue agregado.",
                 'alert-type' => 'info'
