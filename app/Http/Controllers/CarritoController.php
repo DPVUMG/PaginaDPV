@@ -84,9 +84,19 @@ class CarritoController extends Controller
     {
         try {
             $producto = ProductoVariante::where('id', $request->product_id)->where('activo', true)->first();
+
+            if(is_null($producto)) {
+                $notificacion = array(
+                    'message' => "El producto seleccionado ya no cuenta con el precio disponible en la página.",
+                    'alert-type' => 'warning'
+                );
+
+                return redirect()->back()->with($notificacion);
+            }
+
             $oldCart = Session::has('cart') ? Session::get('cart') : null;
             $carro = new Cart($oldCart);
-            $carro->agregar_varios_productos($request->product_id, $request->quantity, $this->productoQuery(Auth::user()->escuela_id, 'ConsultaController.detalle', $request->product_id));
+            $carro->agregar_varios_productos($request->product_id, $request->quantity, $this->productoQuery(Auth::user()->escuela_id, 'ConsultaController.detalle', $producto->producto_id));
 
             $request->session()->put('cart', $carro);
 
@@ -115,26 +125,26 @@ class CarritoController extends Controller
         Modelos: ProductoVariante, Cart
         Retorna: $notificacion
     */
-    public function eliminar(ProductoVariante $producto)
+    public function eliminar($producto)
     {
         try {
             $oldCart = Session::has('cart') ? Session::get('cart') : null;
             $carro = new Cart($oldCart);
-            $carro->eliminar_producto($producto->id);
+            $nombre = $carro->eliminar_producto($producto->id);
 
             count($carro->productos) > 0 ? Session::put('cart', $carro) : Session::forget('cart');
 
             Session::put('cart', $carro);
 
             $notificacion = array(
-                'message' => "El producto {$producto->producto_select->nombre} - {$producto->variante->nombre}/{$producto->presentacion->nombre} fue eliminado del carrito.",
+                'message' => "El producto {$nombre} fue eliminado del carrito.",
                 'alert-type' => 'error'
             );
 
             return redirect()->back()->with($notificacion);
         } catch (\Exception $e) {
             $notificacion = array(
-                'message' => "El producto {$producto->producto_select->nombre} - {$producto->variante->nombre}/{$producto->presentacion->nombre} no fue eliminado del carrito.",
+                'message' => "El producto seleccionado no fue eliminado del carrito.",
                 'alert-type' => 'info'
             );
 
@@ -151,17 +161,17 @@ class CarritoController extends Controller
         Modelos: ProductoVariante, Cart
         Retorna: $notificacion
     */
-    public function eliminar_cantidad(ProductoVariante $producto)
+    public function eliminar_cantidad($producto)
     {
         try {
             $oldCart = Session::has('cart') ? Session::get('cart') : null;
             $carro = new Cart($oldCart);
-            $carro->eliminar_un_producto($producto->id);
+            $nombre = $carro->eliminar_un_producto($producto->id);
 
             Session::put('cart', $carro);
 
             $notificacion = array(
-                'message' => "Al producto {$producto->producto_select->nombre} - {$producto->variante->nombre}/{$producto->presentacion->nombre} se le resto una unidad en el carrito.",
+                'message' => "Al producto {$nombre} se le resto una unidad en el carrito.",
                 'alert-type' => 'warning'
             );
 

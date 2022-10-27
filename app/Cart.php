@@ -128,11 +128,15 @@ class Cart extends Model
             $this->total -= $producto['sub_total'];
             $this->descuento -= $producto['descuento'];
         }
+
+        return $producto['nombre_completo'];
     }
 
     //Función para eliminar la cantidad de uno en uno el producto
     public function eliminar_un_producto($producto_id)
     {
+        $producto = $this->productos[$producto_id];
+
         $this->productos[$producto_id]['cantidad'] -= 1;
 
         $descuento = $this->productos[$producto_id]['precio_real'] - $this->productos[$producto_id]['precio_descuento'];
@@ -158,5 +162,7 @@ class Cart extends Model
                 $this->total = 0;
             }
         }
+
+        return $producto['nombre_completo'];
     }
 }
