@@ -19,6 +19,8 @@
             return ($item->activo && $escuela_id == $item->escuela_id);
             })->first() : null;
             @endphp
+            @if (!is_null($producto_variante))
+
             <div class="col-sm-3">
                 <div class="product-image-wrapper">
                     <span
@@ -54,6 +56,7 @@
                     </div>
                 </div>
             </div>
+            @endif
             @endforeach
             <hr>
             @endforeach
