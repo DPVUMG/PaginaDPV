@@ -83,7 +83,7 @@ class CarritoController extends Controller
     public function agregar_mas(AgregarMasRequest $request)
     {
         try {
-            $producto = ProductoVariante::find($request->product_id);
+            $producto = ProductoVariante::where('id', $request->product_id)->where('activo', true)->first();
             $oldCart = Session::has('cart') ? Session::get('cart') : null;
             $carro = new Cart($oldCart);
             $carro->agregar_varios_productos($request->product_id, $request->quantity, $this->productoQuery(Auth::user()->escuela_id, 'ConsultaController.detalle', $request->product_id));
