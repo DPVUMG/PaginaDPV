@@ -37,6 +37,8 @@ class Controller extends BaseController
 
             case 'ConsultaController.detalle':
                 $informacion = ProductoVariante::consulta($escuela_id)
+                    ->where('producto_variante.activo', true)
+                    ->where('producto.activo', true)
                     ->where('producto_variante.id', $id)
                     ->first();
                 break;
