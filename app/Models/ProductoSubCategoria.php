@@ -28,7 +28,7 @@ class ProductoSubCategoria extends Model
 
     public function producto()
     {
-        return $this->hasOne(Producto::class, 'id', 'producto_id');
+        return $this->hasOne(Producto::class, 'id', 'producto_id')->where('activo', true);
     }
 
     public function categoria()

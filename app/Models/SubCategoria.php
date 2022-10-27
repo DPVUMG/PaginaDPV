@@ -58,5 +58,6 @@ class SubCategoria extends Model
     public function productos()
     {
         return $this->hasMany(ProductoSubCategoria::class, 'sub_categoria_id', 'id');
+
     }
 }

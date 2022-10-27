@@ -11,13 +11,13 @@
             </div>
             @foreach($sub_categoria->productos->take(8) as $item)
             @php
-            $producto_variante = $item->producto->producto_variante->filter(function($item) {
+            $producto_variante = !is_null($item->producto) ? $item->producto->producto_variante->filter(function($item) {
             return $item->activo;
-            })->first();
+            })->first() : null;
             $escuela_id = is_null(Auth::user()) ? 0 : Auth::user()->escuela_id;
-            $escuela = $producto_variante->descuentos->filter(function($item) use ($escuela_id) {
+            $escuela = !is_null($producto_variante) ? $producto_variante->descuentos->filter(function($item) use ($escuela_id) {
             return ($item->activo && $escuela_id == $item->escuela_id);
-            })->first();
+            })->first() : null;
             @endphp
             <div class="col-sm-3">
                 <div class="product-image-wrapper">
