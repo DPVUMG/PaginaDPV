@@ -90,10 +90,10 @@ class ConsultaController extends Controller
         Modelos: ProductoVariante, Categoria
         Retorna: $producto, $categorias
     */
-    public function detalle($producto)
+    public function detalle(ProductoVariante $producto)
     {
         $categorias = Categoria::with(['sub_categorias:id,nombre,categoria_id'])->get();
-        $producto = $this->productoQuery(is_null(Auth::user()) ? 0 : Auth::user()->escuela_id, 'ConsultaController.detalle', $producto);
+        $producto = $this->productoQuery(is_null(Auth::user()) ? 0 : Auth::user()->escuela_id, 'ConsultaController.detalle', $producto->producto_id);
 
         if(is_null($producto)) {
             return view('errors.404');
