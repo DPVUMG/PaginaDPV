@@ -101,7 +101,7 @@ class PedidoController extends Controller
                 $existe = ProductoVariante::where('id', $articulo['producto_variante_id'])->where('activo', true)->first();
 
                 if(is_null($existe)) {
-                    throw new Exception("El producto {$articulo['nombre_completo']} ya no se encuentra disponible con este precio {$articulo['precio_real']}.", 1000);
+                    throw new Exception("El producto {$articulo['nombre_completo']} ya no se encuentra disponible con este precio Q {$articulo['precio_real']}.", 1000);
                 }
 
                 EscuelaDetallePedido::create(
