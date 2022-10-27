@@ -8,6 +8,8 @@ use App\Models\EscuelaPedido;
 use Illuminate\Support\Facades\DB;
 use App\Http\Requests\PedidoRequest;
 use App\Models\EscuelaDetallePedido;
+use App\Models\ProductoVariante;
+use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 
@@ -96,6 +98,12 @@ class PedidoController extends Controller
             );
 
             foreach ($carro->productos as $articulo) {
+                $existe = ProductoVariante::where('id', $articulo['producto_variante_id'])->where('activo', true)->first();
+
+                if(is_null($existe)) {
+                    throw new Exception("El producto {$articulo['nombre_completo']} ya no se encuentra disponible con este precio.", 1000);
+                }
+
                 EscuelaDetallePedido::create(
                     [
                         'cantidad' => $articulo['cantidad'],
@@ -130,7 +138,16 @@ class PedidoController extends Controller
             return redirect()->route('user.perfil')->with($notificacion);
         } catch (\Exception $e) {
             DB::rollback();
-            return redirect()->route('pedido.index')->with('error', $e->getMessage());
+            if($e->getCode() == 1000) {
+                $notificacion = array(
+                    'message' => $e->getMessage(),
+                    'alert-type' => 'warning'
+                );
+
+                return redirect()->route('pedido.index')->with($notificacion);
+            } else {
+                return redirect()->route('pedido.index')->with('error', $e->getMessage());
+            }
         }
     }
 }
