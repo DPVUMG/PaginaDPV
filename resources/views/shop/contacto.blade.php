@@ -18,7 +18,7 @@
 
                     @foreach ($contacto->telefonos as $item)
                     <footer class="blockquote-footer">
-                        <span><i class="fa fa-phone"></i><a href="tel:+502{{ $item->telefono }}"></a></span>
+                        <span><i class="fa fa-phone"></i><a href="tel:+502{{ $item->telefono }}">{{ $item->telefono }}</a></span>
                     </footer>
                     @endforeach
                 </blockquote>
