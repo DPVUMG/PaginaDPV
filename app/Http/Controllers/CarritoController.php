@@ -130,7 +130,7 @@ class CarritoController extends Controller
         try {
             $oldCart = Session::has('cart') ? Session::get('cart') : null;
             $carro = new Cart($oldCart);
-            $nombre = $carro->eliminar_producto($producto->id);
+            $nombre = $carro->eliminar_producto($producto);
 
             count($carro->productos) > 0 ? Session::put('cart', $carro) : Session::forget('cart');
 
@@ -166,7 +166,7 @@ class CarritoController extends Controller
         try {
             $oldCart = Session::has('cart') ? Session::get('cart') : null;
             $carro = new Cart($oldCart);
-            $nombre = $carro->eliminar_un_producto($producto->id);
+            $nombre = $carro->eliminar_un_producto($producto);
 
             Session::put('cart', $carro);
 
