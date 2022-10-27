@@ -46,6 +46,14 @@ class ConsultaController extends Controller
                         ->join('producto_subcategoria', 'sub_categoria.id', 'producto_subcategoria.sub_categoria_id')
                         ->join('producto', 'producto_subcategoria.producto_id', 'producto.id')
                         ->where('producto.activo', true)
+                        ->whereExists(
+                            function ($query) {
+                                $query->select(DB::raw(1))
+                                    ->from('producto_variante')
+                                    ->where('producto_variante.activo', true)
+                                    ->whereRaw('producto_variante.producto_id = producto.id');
+                            }
+                        )
                         ->whereRaw('categoria.id = sub_categoria.categoria_id');
                 }
             )
