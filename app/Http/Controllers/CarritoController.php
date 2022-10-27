@@ -62,6 +62,8 @@ class CarritoController extends Controller
 
             return redirect()->back()->with($notificacion);
         } catch (\Exception $e) {
+
+            dd($e);
             $notificacion = array(
                 'message' => "El producto {$producto->producto_select->nombre} - {$producto->variante->nombre}/{$producto->presentacion->nombre}, no fue agregado.",
                 'alert-type' => 'info'
