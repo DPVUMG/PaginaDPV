@@ -7,6 +7,7 @@ use App\Models\ComentarioProducto;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\ComentarioGeneralRequest;
 use App\Http\Requests\ComentarioProductoRequest;
+use App\Models\ProductoVariante;
 
 class ComentariosController extends Controller
 {
@@ -107,12 +108,13 @@ class ComentariosController extends Controller
     public function comentario_producto_eliminar(ComentarioProducto $id)
     {
         $id->delete();
+        $presentacion = ProductoVariante::where('producto_id', $id->producto_id)->where('activo', true)->first();
 
         $notificacion = array(
             'message' => 'Comentario eliminado.',
             'alert-type' => 'success'
         );
 
-        return redirect()->route('consulta.detalle', ['producto' => $id->product_id])->with($notificacion);
+        return redirect()->route('consulta.detalle', ['producto' => $presentacion->id])->with($notificacion);
     }
 }
